@@ -18,9 +18,9 @@ class FlashingState extends MusicBeatState
 		add(bg);
 
 		warnText = new FlxText(0, 0, FlxG.width,
-			"This game contains some flashing lights!\n\nPress ENTER to disable them now or go to Options Menu\n\nPress ESCAPE to ignore this message",
+			"Sonic 666: The Futures contains some flashing lights\n\nENTER to disable\n\nESC to ignore this message",
 			32);
-		warnText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
+		warnText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.RED, CENTER);
 		warnText.screenCenter(Y);
 		add(warnText);
 	}

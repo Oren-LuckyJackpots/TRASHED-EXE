@@ -8,7 +8,7 @@ class OptionsState extends MusicBeatState
 	var options:Array<String> = [
 		'Note Colors',
 		'Controls',
-		'Adjust Delay and Combo',
+		// 'Adjust Delay and Combo',
 		'Graphics',
 		'Visuals',
 		'Gameplay'
@@ -48,12 +48,13 @@ class OptionsState extends MusicBeatState
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
+		var bg:FlxSprite = new FlxSprite();
+		bg.frames = Paths.getSparrowAtlas('menuDesat');
+		bg.animation.addByPrefix('idle', 'a', 6);
+		bg.animation.play('idle');
+		bg.scale.set(.7, .7);
 		bg.antialiasing = ClientPrefs.data.antialiasing;
-		bg.color = 0xFFea71fd;
 		bg.updateHitbox();
-
-		bg.screenCenter();
 		add(bg);
 
 		grpOptions = new FlxTypedGroup<Alphabet>();
@@ -104,7 +105,7 @@ class OptionsState extends MusicBeatState
 				LoadingState.loadAndSwitchState(new PlayState());
 				FlxG.sound.music.volume = 0;
 			}
-			else MusicBeatState.switchState(new MainMenuState());
+			else MusicBeatState.switchState(new states.ReadyState());
 		}
 		else if (controls.ACCEPT) openSelectedSubstate(options[curSelected]);
 	}

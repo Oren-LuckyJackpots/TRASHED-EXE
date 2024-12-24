@@ -13,10 +13,15 @@ class LanguageSubState extends MusicBeatSubstate
 	{
 		super();
 
-		var bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.color = 0xFFea71fd;
-		bg.antialiasing = ClientPrefs.data.antialiasing;
+		var bg:FlxSprite = new FlxSprite();
+		bg.frames = Paths.getSparrowAtlas('menuDesat');
+		bg.animation.addByPrefix('idle', 'a', 24);
+		bg.animation.play('idle');
+		bg.scale.set(.5, .5);
 		bg.screenCenter();
+		bg.antialiasing = ClientPrefs.data.antialiasing;
+		// bg.color = 0xFFea71fd;
+		bg.updateHitbox();
 		add(bg);
 		add(grpLanguages);
 

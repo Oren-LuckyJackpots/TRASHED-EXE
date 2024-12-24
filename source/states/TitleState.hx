@@ -18,6 +18,7 @@ import shaders.ColorSwap;
 import states.StoryMenuState;
 import states.OutdatedState;
 import states.MainMenuState;
+import states.editors.MasterEditorMenu;
 
 typedef TitleData =
 {
@@ -50,7 +51,7 @@ class TitleState extends MusicBeatState
 	var credTextShit:Alphabet;
 	var ngSpr:FlxSprite;
 	
-	var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
+	var titleTextColors:Array<FlxColor> = [0xFFD20000, 0xFF9A0000];
 	var titleTextAlphas:Array<Float> = [1, .64];
 
 	var curWacky:Array<String> = [];
@@ -148,6 +149,8 @@ class TitleState extends MusicBeatState
 	var titleText:FlxSprite;
 	var swagShader:ColorSwap = null;
 
+	private var title:FlxSprite;
+
 	function startIntro()
 	{
 		persistentUpdate = true;
@@ -155,9 +158,10 @@ class TitleState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
 
 		loadJsonData();
-		#if TITLE_SCREEN_EASTER_EGG easterEggData(); #end
+		// #if TITLE_SCREEN_EASTER_EGG easterEggData(); #end
 		Conductor.bpm = musicBPM;
 
+		/*
 		logoBl = new FlxSprite(logoPosition.x, logoPosition.y);
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
 		logoBl.antialiasing = ClientPrefs.data.antialiasing;
@@ -168,14 +172,28 @@ class TitleState extends MusicBeatState
 
 		gfDance = new FlxSprite(gfPosition.x, gfPosition.y);
 		gfDance.antialiasing = ClientPrefs.data.antialiasing;
+		*/
+
+		title = new FlxSprite();
+		title.frames = Paths.getSparrowAtlas('title');
+		title.animation.addByPrefix('idle', 'a]', 12);
+		title.animation.play('idle');
+		title.scale.set(.7, .7);
+		// title.screenCenter();
+		title.antialiasing = ClientPrefs.data.antialiasing;
+		title.updateHitbox();
+		add(title);
 		
 		if(ClientPrefs.data.shaders)
 		{
+			/*
 			swagShader = new ColorSwap();
 			gfDance.shader = swagShader.shader;
 			logoBl.shader = swagShader.shader;
+			*/
 		}
 		
+		/*
 		gfDance.frames = Paths.getSparrowAtlas(characterImage);
 		if(!useIdle)
 		{
@@ -188,6 +206,7 @@ class TitleState extends MusicBeatState
 			gfDance.animation.addByPrefix('idle', animationName, 24, false);
 			gfDance.animation.play('idle');
 		}
+			*/
 
 
 		var animFrames:Array<FlxFrame> = [];
@@ -212,9 +231,17 @@ class TitleState extends MusicBeatState
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 
+		/*
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
 		logo.antialiasing = ClientPrefs.data.antialiasing;
 		logo.screenCenter();
+		*/
+
+		var vignette:FlxSprite = new FlxSprite().loadGraphic(Paths.image('vignette'));
+		vignette.screenCenter();
+		vignette.antialiasing = ClientPrefs.data.antialiasing;
+		vignette.updateHitbox();
+		add(vignette);
 
 		blackScreen = new FlxSprite().makeGraphic(1, 1, FlxColor.BLACK);
 		blackScreen.scale.set(FlxG.width, FlxG.height);
@@ -225,6 +252,7 @@ class TitleState extends MusicBeatState
 		credTextShit.screenCenter();
 		credTextShit.visible = false;
 
+		/*
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
@@ -234,9 +262,10 @@ class TitleState extends MusicBeatState
 
 		add(gfDance);
 		add(logoBl); //FNF Logo
+		*/
 		add(titleText); //"Press Enter to Begin" text
 		add(credGroup);
-		add(ngSpr);
+		// add(ngSpr);
 
 		if (initialized)
 			skipIntro();
@@ -363,6 +392,8 @@ class TitleState extends MusicBeatState
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;
 
+		FlxG.camera.shake(0.01, 0.01);
+
 		#if mobile
 		for (touch in FlxG.touches.list)
 		{
@@ -409,12 +440,12 @@ class TitleState extends MusicBeatState
 			
 			if(pressedEnter)
 			{
-				titleText.color = FlxColor.WHITE;
+				titleText.color = FlxColor.RED;
 				titleText.alpha = 1;
 				
 				if(titleText != null) titleText.animation.play('press');
 
-				FlxG.camera.flash(ClientPrefs.data.flashing ? FlxColor.WHITE : 0x4CFFFFFF, 1);
+				FlxG.camera.flash(ClientPrefs.data.flashing ? FlxColor.RED : 0x4C710000, 1);
 				FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
 				transitioning = true;
@@ -422,15 +453,20 @@ class TitleState extends MusicBeatState
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
-					if (mustUpdate)
-						MusicBeatState.switchState(new OutdatedState());
-					else
-						MusicBeatState.switchState(new MainMenuState());
+					MusicBeatState.switchState(new options.OptionsState());
+					options.OptionsState.onPlayState = false;
+					if (PlayState.SONG != null)
+					{
+						PlayState.SONG.arrowSkin = null;
+						PlayState.SONG.splashSkin = null;
+						PlayState.stageUI = 'normal';
+					}
 
 					closedState = true;
 				});
 				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 			}
+			/*
 			#if TITLE_SCREEN_EASTER_EGG
 			else if (FlxG.keys.firstJustPressed() != FlxKey.NONE)
 			{
@@ -483,12 +519,20 @@ class TitleState extends MusicBeatState
 				}
 			}
 			#end
+			*/
 		}
 
 		if (initialized && pressedEnter && !skippedIntro)
 		{
 			skipIntro();
 		}
+		#if debug
+		if (controls.justPressed('debug_1'))
+		{
+			FlxG.mouse.visible = false;
+			MusicBeatState.switchState(new MasterEditorMenu());
+		}
+		#end
 
 		if(swagShader != null)
 		{
@@ -563,8 +607,8 @@ class TitleState extends MusicBeatState
 			{
 				case 1:
 					//FlxG.sound.music.stop();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
-					FlxG.sound.music.fadeIn(4, 0, 0.7);
+					FlxG.sound.playMusic(Paths.music('freakyMenu'), .7);
+					/*
 				case 2:
 					createCoolText(["The", "Funkin Crew Inc"]);
 				case 4:
@@ -598,6 +642,7 @@ class TitleState extends MusicBeatState
 					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
 
 				case 17:
+					*/
 					skipIntro();
 			}
 		}
@@ -609,6 +654,7 @@ class TitleState extends MusicBeatState
 	{
 		if (!skippedIntro)
 		{
+			/*
 			#if TITLE_SCREEN_EASTER_EGG
 			if (playJingle) //Ignore deez
 			{
@@ -666,10 +712,11 @@ class TitleState extends MusicBeatState
 				}
 			}
 			else #end //Default! Edit this one!!
+				*/
 			{
-				remove(ngSpr);
+				// remove(ngSpr);
 				remove(credGroup);
-				FlxG.camera.flash(FlxColor.WHITE, 4);
+				FlxG.camera.flash(FlxColor.BLACK, 4);
 
 				var easteregg:String = FlxG.save.data.psychDevsEasterEgg;
 				if (easteregg == null) easteregg = '';

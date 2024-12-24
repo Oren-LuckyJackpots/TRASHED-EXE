@@ -15,6 +15,7 @@ import flixel.util.FlxSave;
 import flixel.input.keyboard.FlxKey;
 import flixel.animation.FlxAnimationController;
 import lime.utils.Assets;
+import lime.app.Application;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.events.KeyboardEvent;
 import haxe.Json;
@@ -496,7 +497,7 @@ class PlayState extends MusicBeatState
 		if(ClientPrefs.data.timeBarType == 'Song Name') timeTxt.text = SONG.song;
 
 		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 4), 'timeBar', function() return songPercent, 0, 1);
-		timeBar.setColors(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]));
+		timeBar.setColors(FlxColor.fromString("#FF0000"));
 		timeBar.scrollFactor.set();
 		timeBar.screenCenter(X);
 		timeBar.alpha = 0;
@@ -539,7 +540,7 @@ class PlayState extends MusicBeatState
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
 		healthBar.visible = !ClientPrefs.data.hideHud;
-		healthBar.alpha = ClientPrefs.data.healthBarAlpha;
+		healthBar.alpha = .0;
 		reloadHealthBarColors();
 		uiGroup.add(healthBar);
 
@@ -556,14 +557,14 @@ class PlayState extends MusicBeatState
 		uiGroup.add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBar.y + 45, FlxG.width, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 18, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 18, FlxColor.RED, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
 		scoreTxt.visible = !ClientPrefs.data.hideHud;
 		updateScore(false);
 		uiGroup.add(scoreTxt);
 
-		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, Language.getPhrase("Botplay").toUpperCase(), 32);
+		botplayTxt = new FlxText(400, healthBar.y - 90, FlxG.width - 800, Language.getPhrase("...").toUpperCase(), 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
 		botplayTxt.borderSize = 1.25;
@@ -1153,8 +1154,8 @@ class PlayState extends MusicBeatState
 			percent = CoolUtil.floorDecimal(ratingPercent * 100, 2);
 
 		var tempScore:String;
-		if(!instakillOnMiss) tempScore = Language.getPhrase('score_text', 'Score: {1} - Misses: {2} - Accuracy: {3}% - Rank: {4}', [songScore, songMisses, percent, ratingFC]);
-		else tempScore = Language.getPhrase('score_text_instakill', 'Score: {1} - Accuracy: {2}% - Rank: {3}', [songScore, percent, ratingFC]);
+		if(!instakillOnMiss) tempScore = Language.getPhrase('score_text', 'SCORE - {1}', [songScore]);
+		else tempScore = Language.getPhrase('score_text_instakill', 'SCORE - {1}', [songScore]);
 		scoreTxt.text = tempScore;
 	}
 
@@ -1688,6 +1689,59 @@ class PlayState extends MusicBeatState
 			}
 		}
 		else FlxG.camera.followLerp = 0;
+
+		if (ClientPrefs.data.singingCamMove && !isCameraOnForcedPos && camFollow != null && !endingSong)
+		{
+			var ofs = 30;
+
+			if (SONG.notes[curSection].mustHitSection && !SONG.notes[curSection].gfSection)
+			{
+				var xx2 = boyfriend.getMidpoint().x - 160;
+				var yy2 = boyfriend.getMidpoint().y - 115;
+
+				switch (boyfriend.animation.curAnim.name)
+				{
+					case "idle" | "idle-alt":
+						camFollow.setPosition(xx2, yy2);
+
+					case "singLEFT" | "singLEFT-alt":
+						camFollow.setPosition(xx2 - ofs, yy2);
+
+					case "singDOWN" | "singDOWN-alt":
+						camFollow.setPosition(xx2, yy2 + ofs);
+
+					case "singUP" | "singUP-alt":
+						camFollow.setPosition(xx2, yy2 - ofs);
+
+					case "singRIGHT" | "singRIGHT-alt":
+						camFollow.setPosition(xx2 + ofs, yy2);
+				}
+			}
+			else if (!SONG.notes[curSection].mustHitSection && !SONG.notes[curSection].gfSection)
+			{
+				var xx2 = dad.getMidpoint().x + 290;
+				var yy2 = dad.getMidpoint().y - 75;
+
+				switch (dad.animation.curAnim.name)
+				{
+					case "idle" | "idle-alt":
+						camFollow.setPosition(xx2, yy2);
+
+					case "singLEFT" | "singLEFT-alt":
+						camFollow.setPosition(xx2 - ofs, yy2);
+
+					case "singDOWN" | "singDOWN-alt":
+						camFollow.setPosition(xx2, yy2 + ofs);
+
+					case "singUP" | "singUP-alt":
+						camFollow.setPosition(xx2, yy2 - ofs);
+
+					case "singRIGHT" | "singRIGHT-alt":
+						camFollow.setPosition(xx2 + ofs, yy2);
+				}
+			}
+		}
+
 		callOnScripts('onUpdate', [elapsed]);
 
 		super.update(elapsed);
@@ -1708,6 +1762,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		#if debug
 		if(!endingSong && !inCutscene && allowDebugKeys)
 		{
 			if (controls.justPressed('debug_1'))
@@ -1715,6 +1770,7 @@ class PlayState extends MusicBeatState
 			else if (controls.justPressed('debug_2'))
 				openCharacterEditor();
 		}
+		#end
 
 		if (healthBar.bounds.max != null && health > healthBar.bounds.max)
 			health = healthBar.bounds.max;
@@ -2513,11 +2569,15 @@ class PlayState extends MusicBeatState
 				if (storyPlaylist.length <= 0)
 				{
 					Mods.loadTopMod();
-					FlxG.sound.playMusic(Paths.music('freakyMenu'));
+					// FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					#if DISCORD_ALLOWED DiscordClient.resetClientID(); #end
 
 					canResync = false;
-					MusicBeatState.switchState(new StoryMenuState());
+					// MusicBeatState.switchState(new StoryMenuState());
+					Application.current.window.alert("縺ｶ縺｡繧??縺｡繧?く繧ｹ縺励◆縺", "Sonic 666: The Futures");
+					#if DISCORD_ALLOWED
+					DiscordClient.shutdown();
+					#end
 
 					// if ()
 					if(!ClientPrefs.getGameplaySetting('practice') && !ClientPrefs.getGameplaySetting('botplay')) {

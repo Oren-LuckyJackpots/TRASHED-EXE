@@ -72,10 +72,15 @@ class ControlsSubState extends MusicBeatSubstate
 		options.push([true]);
 		options.push([true, defaultKey]);
 
-		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.color = keyboardColor;
+		bg = new FlxSprite();
+		bg.frames = Paths.getSparrowAtlas('menuDesat');
+		bg.animation.addByPrefix('idle', 'a', 6);
+		bg.animation.play('idle');
+		bg.scale.set(.7, .7);
+		// bg.screenCenter();
 		bg.antialiasing = ClientPrefs.data.antialiasing;
-		bg.screenCenter();
+		// bg.color = 0xFFea71fd;
+		bg.updateHitbox();
 		add(bg);
 
 		var grid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x33FFFFFF, 0x0));
@@ -501,8 +506,8 @@ class ControlsSubState extends MusicBeatSubstate
 
 	function swapMode()
 	{
-		FlxTween.cancelTweensOf(bg);
-		FlxTween.color(bg, 0.5, bg.color, onKeyboardMode ? gamepadColor : keyboardColor, {ease: FlxEase.linear});
+		// FlxTween.cancelTweensOf(bg);
+		// FlxTween.color(bg, 0.5, bg.color, onKeyboardMode ? gamepadColor : keyboardColor, {ease: FlxEase.linear});
 		onKeyboardMode = !onKeyboardMode;
 
 		curSelected = 0;

@@ -55,11 +55,16 @@ class NotesColorSubState extends MusicBeatSubstate
 		#end
 		
 		onPixel = PlayState.isPixelStage;
-		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.color = 0xFFEA71FD;
-		bg.screenCenter();
-		bg.antialiasing = ClientPrefs.data.antialiasing;
-		add(bg);
+
+		var a:FlxSprite = new FlxSprite();
+		a.frames = Paths.getSparrowAtlas('menuDesat');
+		a.animation.addByPrefix('idle', 'a', 6);
+		a.animation.play('idle');
+		a.scale.set(.7, .7);
+		a.antialiasing = ClientPrefs.data.antialiasing;
+		// bg.color = 0xFFea71fd;
+		a.updateHitbox();
+		add(a);
 
 		var grid:FlxBackdrop = new FlxBackdrop(FlxGridOverlay.createGrid(80, 80, 160, 160, true, 0x33FFFFFF, 0x0));
 		grid.velocity.set(40, 40);

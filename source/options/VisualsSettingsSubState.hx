@@ -111,6 +111,12 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			BOOL);
 		addOption(option);
 
+		var option:Option = new Option('Singing Cam Zoom',
+		    "Singing and cam move :3",
+			'singingCamMove',
+			BOOL);
+		addOption(option);
+
 		var option:Option = new Option('Score Text Grow on Hit',
 			"If unchecked, disables the Score text growing\neverytime you hit a note.",
 			'scoreZoom',
@@ -141,8 +147,8 @@ class VisualsSettingsSubState extends BaseOptionsMenu
 			"What song do you prefer for the Pause Screen?",
 			'pauseMusic',
 			STRING,
-			['None', 'Tea Time', 'Breakfast', 'Breakfast (Pico)']);
-		addOption(option);
+			['None', 'Tea Time', 'Breakfast', 'Breakfast (Pico)', 'Get Out']);
+		// addOption(option);
 		option.onChange = onChangePauseMusic;
 		
 		#if CHECK_FOR_UPDATES

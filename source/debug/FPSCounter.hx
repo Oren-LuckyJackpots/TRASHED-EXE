@@ -23,7 +23,7 @@ class FPSCounter extends TextField
 
 	@:noCompletion private var times:Array<Float>;
 
-	public function new(x:Float = 30, y:Float = 50, color:Int = 0x000000)
+	public function new(x:Float = 30, y:Float = 50, color:Int = 0xFF0000)
 	{
 		super();
 
